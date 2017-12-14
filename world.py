@@ -12,20 +12,29 @@ class TiledMap:
 
     def render(self, top, bottom):
         surface = bottom
-        img = self.tilemap.get_tile_image_by_gid
-        tw = self.tilemap.tilewidth
-        th = self.tilemap.tileheight
         for layer in self.tilemap.visible_layers:
-            for x, y, gid in layer:
-                tile = img(gid)
-                if tile:
-                    surface.blit(tile, (x * tw, y * th))
-                    if layer.name == 'collision':
-                        Obstacle(self.game, x, y, self.game.obstacles)
+            if isinstance(layer, pytmx.TiledTileLayer):
+                self.draw_tile_layer(layer, surface)
+            elif isinstance(layer, pytmx.TiledObjectGroup):
+                self.create_objects(layer)
             if layer.name == 'collision':
                 surface = top
 
-    def make_map(self, game):
+    def draw_tile_layer(self, layer, surface):
+        tw = self.tilemap.tilewidth
+        th = self.tilemap.tileheight
+        img = self.tilemap.get_tile_image_by_gid
+        for x, y, gid in layer:
+            tile = img(gid)
+            if tile:
+                surface.blit(tile, (x * tw, y * th))
+                if layer.name == 'collision':
+                    Obstacle(self.game, x, y, self.game.obstacles)
+
+    def create_objects(self, layer):
+        print(layer.name, self.tilemap)
+
+    def make_map(self):
         w = self.width * self.tilemap.tilewidth
         h = self.height * self.tilemap.tileheight
         top = pygame.Surface((w, h), pygame.SRCALPHA, 32).convert_alpha()
@@ -35,22 +44,22 @@ class TiledMap:
 
 
 class Camera:
-    def __init__(self, world, display:pygame.Surface, tile_size):
+    def __init__(self, world, display: pygame.Surface, tile_size):
         self.tile_size = tile_size
         self.world_width, self.world_height = world.width * self.tile_size, world.height * self.tile_size
         self.display_width, self.display_height = display.get_size()
         self.camera = pygame.Rect(0, 0, world.width, world.height)
 
-    def update(self, target):                                                            ### WORLD #####################
-        x = -target.rect.centerx + int(self.display_width / 2)                           #                             #
-        y = -target.rect.centery + int(self.display_height / 2)                          #                             #
-        #                                                                                #   +--camera---------+       #
-        # don't scroll past the edge of the world in any direction                       #   |                 |       #
-        x = min(0, x)  # left                                                            #   |     target      |       #
-        y = min(0, y)  # top                                                             #   |                 |       #
-        x = max(-(self.world_width - self.display_width), x)  # right                    #   +-----------------+       #
-        y = max(-(self.world_height - self.display_height), y)  # bottom                 #                             #
-        self.camera = pygame.Rect(x, y, self.world_width, self.world_height)             ###############################
+    def update(self, target):
+        x = -target.rect.centerx + int(self.display_width / 2)
+        y = -target.rect.centery + int(self.display_height / 2)
+        #
+        # don't scroll past the edge of the world in any direction
+        x = min(0, x)  # left
+        y = min(0, y)  # top
+        x = max(-(self.world_width - self.display_width), x)  # right
+        y = max(-(self.world_height - self.display_height), y)  # bottom
+        self.camera = pygame.Rect(x, y, self.world_width, self.world_height)
 
     def apply(self, entity):
         if isinstance(entity, pygame.sprite.Sprite):

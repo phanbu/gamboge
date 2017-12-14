@@ -13,15 +13,6 @@ DIRECTIONS = {
 }
 
 
-def test_collision(one, two):
-    r = pygame.Rect(
-        one.current_move.x * one.game.tile_size,
-        one.current_move.y * one.game.tile_size,
-        one.game.tile_size, one.game.tile_size
-    )
-    return r.colliderect(two.rect)
-
-
 class Character(pygame.sprite.Sprite):
     def __init__(self, game, x, y, *groups):
         super().__init__(groups)
@@ -37,7 +28,7 @@ class Character(pygame.sprite.Sprite):
             self.started_moving = pygame.time.get_ticks()
             self.direction = DIRECTIONS[direction] or DIRECTIONS['stop']
             self.current_move = self.position + self.direction
-            if pygame.sprite.spritecollide(self, self.game.obstacles, False, test_collision):
+            if pygame.sprite.spritecollide(self, self.game.obstacles, False, _test_collision):
                 self.current_move = self.position
                 self.direction = DIRECTIONS['stop']
 
@@ -96,3 +87,11 @@ class Obstacle(pygame.sprite.Sprite):
         ts = game.tile_size
         self.rect = pygame.Rect(x * ts, y * ts, ts, ts)
 
+
+def _test_collision(one, two):
+    r = pygame.Rect(
+        one.current_move.x * one.game.tile_size,
+        one.current_move.y * one.game.tile_size,
+        one.game.tile_size, one.game.tile_size
+    )
+    return r.colliderect(two.rect)
