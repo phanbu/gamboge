@@ -33,7 +33,7 @@ class Game:
         self.obstacles = pygame.sprite.Group()
         #
         # sprites
-        self.world_img_top, self.world_img_bottom = self.world.make_map(self)
+        self.world_img_top, self.world_img_bottom = self.world.make_map()
         self.player = Player(self, 20, 20, self.characters)
         #
         # camera
@@ -66,6 +66,11 @@ class Game:
         for sprite in self.characters:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         self.screen.blit(self.world_img_top, self.camera.apply(self.world_img_top.get_rect()))
+
+        # s = pygame.Surface((self.screen.get_width(),self.screen.get_height()), pygame.SRCALPHA)
+        # s.fill((75,75,75,128))
+        # self.screen.blit(s, (0,0))
+
         pygame.display.flip()
 
 
