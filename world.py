@@ -1,6 +1,117 @@
 import pygame
 import pytmx
-from sprites import Obstacle
+from os import path
+from sprites import Obstacle, Player
+from state import GameState
+
+
+class SplashState(GameState):
+    def __init__(self, game):
+        super().__init__(game)
+        self.screen = game.screen
+        self.title_font = pygame.font.SysFont("Arial", 55, True)
+        self.title_text = self.game.title.split(" ")
+        self.instr_font = pygame.font.SysFont("Ariel", 25)
+        self.instr_text = "press any key to begin"
+
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.quit()
+            elif event.type == pygame.KEYDOWN:
+                self.game.adventure()
+
+    def draw(self):
+        self.screen.fill(0)
+        title_top = 10
+        for text in self.title_text:
+            title = self.title_font.render(text, True, (228,155,15))
+            self.screen.blit(title, (10,title_top))
+            title_top += title.get_height() + 5
+        instruction = self.instr_font.render(self.instr_text, True, (255,255,255))
+        instr_top = self.screen.get_height() - instruction.get_height() - 20
+        self.screen.blit(instruction, (10, instr_top))
+        pygame.display.flip()
+
+
+class AdventureState(GameState):
+    def __init__(self, game):
+        super().__init__(game)
+        self.tile_size = 16
+        #
+        # game world
+        map_folder = path.join(path.dirname(__file__), 'maps')
+        self.world = TiledMap(path.join(map_folder, 'village.tmx'), self)
+        #
+        # sprite groups
+        self.characters = pygame.sprite.Group()
+        self.obstacles = pygame.sprite.Group()
+        #
+        # sprites
+        self.world_img_top, self.world_img_bottom = self.world.make_map()
+        self.player = Player(self, 20, 20, self.characters)
+        #
+        # camera
+        self.camera = Camera(self.world, self.screen, self.tile_size)
+
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.quit()
+            if (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
+                self.game.quit()
+
+    def update(self):
+        self.characters.update()
+        self.camera.update(self.player)
+        print('updating adventure state')
+
+    def draw(self):
+        pygame.display.set_caption(self.title + " [{:.2f} FPS]".format(self.clock.get_fps()))
+        self.screen.blit(self.world_img_bottom, self.camera.apply(self.world_img_bottom.get_rect()))
+        for sprite in self.characters:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
+        self.screen.blit(self.world_img_top, self.camera.apply(self.world_img_top.get_rect()))
+
+
+class AdventureState(GameState):
+    def __init__(self, game):
+        super().__init__(game)
+        self.tile_size = 16
+        self.img_folder = game.img_folder
+        #
+        # game world
+        map_folder = path.join(path.dirname(__file__), 'maps')
+        self.world = TiledMap(path.join(map_folder, 'village.tmx'), self)
+        #
+        # sprite groups
+        self.characters = pygame.sprite.Group()
+        self.obstacles = pygame.sprite.Group()
+        #
+        # sprites
+        self.world_img_top, self.world_img_bottom = self.world.make_map()
+        self.player = Player(self, 20, 20, self.characters)
+        #
+        # camera
+        self.camera = Camera(self.world, self.game.screen, self.tile_size)
+
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.quit()
+            if (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
+                self.game.quit()
+
+    def update(self):
+        self.characters.update()
+        self.camera.update(self.player)
+
+    def draw(self):
+        pygame.display.set_caption(self.game.title + " [{:.2f} FPS]".format(self.game.clock.get_fps()))
+        self.game.screen.blit(self.world_img_bottom, self.camera.apply(self.world_img_bottom.get_rect()))
+        for sprite in self.characters:
+            self.game.screen.blit(sprite.image, self.camera.apply(sprite))
+        self.game.screen.blit(self.world_img_top, self.camera.apply(self.world_img_top.get_rect()))
 
 
 class TiledMap:
