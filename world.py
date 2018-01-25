@@ -8,12 +8,30 @@ from state import GameState
 class SplashState(GameState):
     def __init__(self, game):
         super().__init__(game)
+        self.screen = game.screen
+        self.title_font = pygame.font.SysFont("Arial", 55, True)
+        self.title_text = self.game.title.split(" ")
+        self.instr_font = pygame.font.SysFont("Ariel", 25)
+        self.instr_text = "press any key to begin"
 
     def events(self):
-        pass
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game.quit()
+            elif event.type == pygame.KEYDOWN:
+                self.game.adventure()
 
     def draw(self):
-        self.game.adventure()
+        self.screen.fill(0)
+        title_top = 10
+        for text in self.title_text:
+            title = self.title_font.render(text, True, (228,155,15))
+            self.screen.blit(title, (10,title_top))
+            title_top += title.get_height() + 5
+        instruction = self.instr_font.render(self.instr_text, True, (255,255,255))
+        instr_top = self.screen.get_height() - instruction.get_height() - 20
+        self.screen.blit(instruction, (10, instr_top))
+        pygame.display.flip()
 
 
 class AdventureState(GameState):
