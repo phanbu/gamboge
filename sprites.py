@@ -94,6 +94,35 @@ class Player(Character):
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                 self.image = self.sprite_sheet.get_image(3)
                 self.start_moving('right')
+            if keys[pygame.K_SPACE]:
+                s = pygame.sprite.spritecollideany(self, self.game.interacts)
+                if s: s.interact()
+
+
+class Bob(Character):
+    def __init__(self, game, x, y, *groups):
+        super().__init__(game, x, y, groups)
+        self.bob_img = path.join(self.game.img_folder, 'p007.png')
+        self.sprite_sheet = SpriteSheetGrid(self.bob_img, 3, 4, color_key=None, has_alpha=True)
+        self.image = self.sprite_sheet.get_image(1)
+        self.rect = self.image.get_rect()
+        self.move_rect(self.position)
+        self.message = None
+        self.started_talking = None
+        self.talk_ticks = 2_000
+
+    def interact(self):
+        self.started_talking = pygame.time.get_ticks()
+        if self.message is None:
+            self.message = MessageBox("Hey! You can't leave town yet.", self.game.messages)
+            self.game.messages.add(self.message)
+
+    def update(self):
+        if self.started_talking is not None:
+            ticks = pygame.time.get_ticks() - self.started_talking
+            if ticks > self.talk_ticks and self.message is not None:
+                self.message.kill()
+                self.message = None
 
 
 class Obstacle(pygame.sprite.Sprite):
@@ -101,6 +130,22 @@ class Obstacle(pygame.sprite.Sprite):
         super().__init__(groups)
         ts = game.tile_size
         self.rect = pygame.Rect(x * ts, y * ts, ts, ts)
+
+
+class MessageBox(pygame.sprite.Sprite):
+    def __init__(self, text, *groups):
+        super().__init__(groups)
+        s = pygame.display.get_surface()
+        x = s.get_width() * 1/5
+        y = s.get_height() * 2/5
+        w = s.get_width() * 3/5
+        h = s.get_height() * 1/5
+        self.rect = pygame.Rect(x, y, w, h)
+        self.image = pygame.Surface((w, h))
+        self.image.fill(0)
+        f = pygame.font.SysFont('Ariel', 20)
+        s = f.render(text, True, (255,255,255))
+        self.image.blit(s, (5,5))
 
 
 def _test_collision(one, two):

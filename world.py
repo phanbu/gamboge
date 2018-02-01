@@ -1,7 +1,7 @@
 import pygame
 import pytmx
 from os import path
-from sprites import Obstacle, Player
+from sprites import *
 from state import GameState
 
 
@@ -38,46 +38,6 @@ class AdventureState(GameState):
     def __init__(self, game):
         super().__init__(game)
         self.tile_size = 16
-        #
-        # game world
-        map_folder = path.join(path.dirname(__file__), 'maps')
-        self.world = TiledMap(path.join(map_folder, 'village.tmx'), self)
-        #
-        # sprite groups
-        self.characters = pygame.sprite.Group()
-        self.obstacles = pygame.sprite.Group()
-        #
-        # sprites
-        self.world_img_top, self.world_img_bottom = self.world.make_map()
-        self.player = Player(self, 20, 20, self.characters)
-        #
-        # camera
-        self.camera = Camera(self.world, self.screen, self.tile_size)
-
-    def events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.game.quit()
-            if (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
-                self.game.quit()
-
-    def update(self):
-        self.characters.update()
-        self.camera.update(self.player)
-        print('updating adventure state')
-
-    def draw(self):
-        pygame.display.set_caption(self.title + " [{:.2f} FPS]".format(self.clock.get_fps()))
-        self.screen.blit(self.world_img_bottom, self.camera.apply(self.world_img_bottom.get_rect()))
-        for sprite in self.characters:
-            self.screen.blit(sprite.image, self.camera.apply(sprite))
-        self.screen.blit(self.world_img_top, self.camera.apply(self.world_img_top.get_rect()))
-
-
-class AdventureState(GameState):
-    def __init__(self, game):
-        super().__init__(game)
-        self.tile_size = 16
         self.img_folder = game.img_folder
         #
         # game world
@@ -87,10 +47,13 @@ class AdventureState(GameState):
         # sprite groups
         self.characters = pygame.sprite.Group()
         self.obstacles = pygame.sprite.Group()
+        self.interacts = pygame.sprite.Group()
+        self.messages = pygame.sprite.Group()
         #
         # sprites
         self.world_img_top, self.world_img_bottom = self.world.make_map()
         self.player = Player(self, 20, 20, self.characters)
+        self.bob = Bob(self, 25, 3, self.characters, self.interacts)
         #
         # camera
         self.camera = Camera(self.world, self.game.screen, self.tile_size)
@@ -104,6 +67,7 @@ class AdventureState(GameState):
 
     def update(self):
         self.characters.update()
+        self.messages.update()
         self.camera.update(self.player)
 
     def draw(self):
@@ -112,6 +76,8 @@ class AdventureState(GameState):
         for sprite in self.characters:
             self.game.screen.blit(sprite.image, self.camera.apply(sprite))
         self.game.screen.blit(self.world_img_top, self.camera.apply(self.world_img_top.get_rect()))
+        for sprite in self.messages:
+            self.game.screen.blit(sprite.image, sprite)
 
 
 class TiledMap:
