@@ -35,7 +35,7 @@ class Game:
             pygame.display.flip()
 
     def adventure(self):
-        self.state = self.adventure_state
+        self.state = self.adventure_state   
 
     def quit(self):
         self.state = None
