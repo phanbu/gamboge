@@ -1,6 +1,6 @@
 import pygame
 from os import path
-from spritesheet import SpriteSheetStrip
+from spritesheet import *
 
 Vector = pygame.math.Vector2
 
@@ -18,44 +18,44 @@ class Character(pygame.sprite.Sprite):
         super().__init__(groups)
         self.game = game
         self.current_move = self.position = Vector(x, y)
-        self.direction = Vector(0, 0)
+        self.facing = 'down'
+        self.is_moving = False
+        self.move_anim = 'stop'
         self.started_moving = None
-        self.speed = 100  # millis per grid square
+        self.millis_per_grid_sq = 100
         self.rect = None
 
     def start_moving(self, direction):
-        if not self.is_moving():
+        if not self.is_moving:
             self.started_moving = pygame.time.get_ticks()
-            self.direction = DIRECTIONS[direction] or DIRECTIONS['stop']
-            self.current_move = self.position + self.direction
+            self.facing = direction
+            self.is_moving = True
+            self.current_move = self.position + DIRECTIONS[self.facing]
             if pygame.sprite.spritecollide(self, self.game.obstacles, False, _test_collision):
                 self.current_move = self.position
-                self.direction = DIRECTIONS['stop']
+                self.is_moving = False
 
     def update(self):
-        if self.is_moving():
+        if self.is_moving:
             ticks = pygame.time.get_ticks() - self.started_moving
-            diff = min(ticks/self.speed, 1.0)
-            distance = diff * self.direction
+            diff = min(ticks / self.millis_per_grid_sq, 1.0)
+            distance = diff * DIRECTIONS[self.facing]
             self.move_rect(self.position, distance)
             if diff == 1.0:
                 self.position = self.current_move
-                self.direction = DIRECTIONS['stop']
+                self.is_moving = False
 
     def move_rect(self, position, distance=Vector(0, 0)):
         ts = self.game.tile_size
         loc = (self.position * ts) + (distance * ts)
         self.rect.bottomleft = (loc.x, loc.y + ts)
 
-    def is_moving(self):
-        return self.direction.length() > 0.0
-
 
 class Player(Character):
     def __init__(self, game, x, y, *groups):
         super().__init__(game, x, y, groups)
-        self.player_img = path.join(self.game.img_folder, 'pokemon-player.png')
-        self.sprite_sheet = SpriteSheetStrip(self.player_img, 4, color_key=None, has_alpha=True)
+        self.player_img = path.join(self.game.img_folder, 'p017.png')
+        self.sprite_sheet = SpriteSheetGrid(self.player_img, 3, 4, color_key=None, has_alpha=True)
         self.image = self.sprite_sheet.get_image(0)
         self.rect = self.image.get_rect()
         self.move_rect(self.position)
@@ -63,9 +63,24 @@ class Player(Character):
     def update(self):
         self.read_controls()
         super().update()
+        if self.is_moving:
+            ticks = pygame.time.get_ticks() - self.started_moving
+            diff = min(ticks / self.millis_per_grid_sq, 1.0)
+            anim = 0 if diff < 0.5 else 2
+        else:
+            anim = 1
+        if self.facing == 'up':
+            self.image = self.sprite_sheet.get_image((anim, 3))
+        elif self.facing == 'down':
+            self.image = self.sprite_sheet.get_image((anim, 0))
+        elif self.facing == 'left':
+            self.image = self.sprite_sheet.get_image((anim, 1))
+        elif self.facing == 'right':
+            self.image = self.sprite_sheet.get_image((anim, 2))
+
 
     def read_controls(self):
-        if not self.is_moving():
+        if not self.is_moving:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_DOWN] or keys[pygame.K_s]:
                 self.image = self.sprite_sheet.get_image(0)
