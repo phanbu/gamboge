@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
- <tileset firstgid="1" source="./Pokemon-legends.tsx"/>
+<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" name="pokemon-legends-tileset" tilewidth="32" tileheight="32" tilecount="21000" columns="140">
+  <image source="pokemon-legends-tileset.png" width="4480" height="4800"/>
+ </tileset>
  <layer name="collisions" width="30" height="30">
   <data encoding="csv">
 5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,5492,

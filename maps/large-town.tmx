@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextobjectid="17">
- <tileset firstgid="1" source="../../zombies/maps/pokemon-legends_tileset.tsx"/>
+<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextobjectid="17">
+ <tileset firstgid="1" name="pokemon-legends-tileset" tilewidth="32" tileheight="32" tilecount="21000" columns="140">
+  <image source="pokemon-legends-tileset.png" width="4480" height="4800"/>
+ </tileset>
  <layer name="undermap" width="50" height="50" locked="1">
   <data encoding="csv">
 4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,4635,

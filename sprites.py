@@ -31,11 +31,12 @@ class Character(pygame.sprite.Sprite):
             self.facing = direction
             self.is_moving = True
             self.current_move = self.position + DIRECTIONS[self.facing]
-            if pygame.sprite.spritecollide(self, self.game.obstacles, False, _test_collision):
+            if pygame.sprite.spritecollide(self, self.game.obstacles, False, test_for_collision):
                 self.current_move = self.position
                 self.is_moving = False
 
     def update(self):
+        super().update()
         if self.is_moving:
             ticks = pygame.time.get_ticks() - self.started_moving
             diff = min(ticks / self.millis_per_grid_sq, 1.0)
@@ -95,7 +96,7 @@ class Player(Character):
                 self.image = self.sprite_sheet.get_image(3)
                 self.start_moving('right')
             if keys[pygame.K_SPACE]:
-                s = pygame.sprite.spritecollideany(self, self.game.interacts)
+                s = pygame.sprite.spritecollideany(self, self.game.interacts, nearby)
                 if s: s.interact()
 
 
@@ -114,7 +115,7 @@ class Bob(Character):
     def interact(self):
         self.started_talking = pygame.time.get_ticks()
         if self.message is None:
-            self.message = MessageBox("Hey! You can't leave town yet.", self.game.messages)
+            self.message = MessageBox("Bob:  Hey! You can't leave town yet.", self.game.messages)
             self.game.messages.add(self.message)
 
     def update(self):
@@ -148,10 +149,19 @@ class MessageBox(pygame.sprite.Sprite):
         self.image.blit(s, (5,5))
 
 
-def _test_collision(one, two):
+def test_for_collision(one, two):
     r = pygame.Rect(
         one.current_move.x * one.game.tile_size,
         one.current_move.y * one.game.tile_size,
         one.game.tile_size, one.game.tile_size
+    )
+    return r.colliderect(two.rect)
+
+def nearby(one, two):
+    ts = one.game.tile_size
+    r = pygame.Rect(
+        one.position.x * ts - ts,
+        one.position.y * ts - ts,
+        3*ts, 3*ts
     )
     return r.colliderect(two.rect)

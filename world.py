@@ -37,12 +37,12 @@ class SplashState(GameState):
 class AdventureState(GameState):
     def __init__(self, game):
         super().__init__(game)
-        self.tile_size = 16
         self.img_folder = game.img_folder
         #
         # game world
         map_folder = path.join(path.dirname(__file__), 'maps')
         self.world = TiledMap(path.join(map_folder, 'village.tmx'), self)
+        self.tile_size = self.world.tilemap.tilewidth;
         #
         # sprite groups
         self.characters = pygame.sprite.Group()
