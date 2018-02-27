@@ -100,11 +100,12 @@ class Player(Character):
                 if s: s.interact()
 
 
-class Bob(Character):
-    def __init__(self, game, x, y, *groups):
+class NPC(Character):
+    def __init__(self, game, name, x, y, img, *groups):
         super().__init__(game, x, y, groups)
-        self.bob_img = path.join(self.game.img_folder, 'p007.png')
-        self.sprite_sheet = SpriteSheetGrid(self.bob_img, 3, 4, color_key=None, has_alpha=True)
+        self.name = name
+        self.img_file = path.join(self.game.img_folder, img + '.png')
+        self.sprite_sheet = SpriteSheetGrid(self.img_file, 3, 4, color_key=None, has_alpha=True)
         self.image = self.sprite_sheet.get_image(1)
         self.rect = self.image.get_rect()
         self.move_rect(self.position)

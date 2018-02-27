@@ -35,13 +35,13 @@ class SplashState(GameState):
 
 
 class AdventureState(GameState):
-    def __init__(self, game):
+    def __init__(self, game, map_name):
         super().__init__(game)
         self.img_folder = game.img_folder
         #
         # game world
         map_folder = path.join(path.dirname(__file__), 'maps')
-        self.world = TiledMap(path.join(map_folder, 'village.tmx'), self)
+        self.world = TiledMap(path.join(map_folder, map_name+'.tmx'), self)
         self.tile_size = self.world.tilemap.tilewidth;
         #
         # sprite groups
@@ -53,10 +53,20 @@ class AdventureState(GameState):
         # sprites
         self.world_img_top, self.world_img_bottom = self.world.make_map()
         self.player = Player(self, 20, 20, self.characters)
-        self.bob = Bob(self, 25, 3, self.characters, self.interacts)
+        self.load_npcs(map_name)
         #
         # camera
         self.camera = Camera(self.world, self.game.screen, self.tile_size)
+
+    def load_npcs(self, map_name):
+        with open('npcs.txt') as f:
+            for line in f:
+                line = line.strip();
+                if line:
+                    (name, img, npc_map, x, y) = line.split(':')
+                    if map_name == npc_map:
+                        NPC(self, name, int(x), int(y), img, self.characters, self.interacts)
+
 
     def events(self):
         for event in pygame.event.get():
