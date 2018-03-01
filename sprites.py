@@ -139,7 +139,7 @@ class MessageBox(pygame.sprite.Sprite):
         super().__init__(groups)
         s = pygame.display.get_surface()
         x = s.get_width() * 1/5
-        y = s.get_height() * 2/5
+        y = s.get_height() * 4/5
         w = s.get_width() * 3/5
         h = s.get_height() * 1/5
         self.rect = pygame.Rect(x, y, w, h)

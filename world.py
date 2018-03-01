@@ -65,7 +65,7 @@ class AdventureState(GameState):
                 if line:
                     (name, img, npc_map, x, y) = line.split(':')
                     if map_name == npc_map:
-                        NPC(self, name, int(x), int(y), img, self.characters, self.interacts)
+                        NPC(self, name, int(x), int(y), img, self.characters, self.obstacles, self.interacts)
 
 
     def events(self):
