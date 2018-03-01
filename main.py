@@ -20,11 +20,11 @@ class Game:
         #
         # clock
         self.clock = pygame.time.Clock()
-        self.delta_t = 0                     # represents the change in time since the last frame (in milliseconds)
+        self.delta_t = 0
         #
         # game states
         self.splash_state = SplashState(self)
-        self.adventure_state = AdventureState(self)
+        self.adventure_state = AdventureState(self, 'village')
         self.state = self.splash_state
 
     def run(self):
