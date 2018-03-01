@@ -24,6 +24,8 @@ class Character(pygame.sprite.Sprite):
         self.started_moving = None
         self.millis_per_grid_sq = 100
         self.rect = None
+        self.footstep = pygame.mixer.Sound("./sfx/footstep.wav")
+
 
     def start_moving(self, direction):
         if not self.is_moving:
@@ -45,6 +47,7 @@ class Character(pygame.sprite.Sprite):
             if diff == 1.0:
                 self.position = self.current_move
                 self.is_moving = False
+                self.footstep.play()
 
     def move_rect(self, position, distance=Vector(0, 0)):
         ts = self.game.tile_size

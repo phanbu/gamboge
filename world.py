@@ -57,6 +57,10 @@ class AdventureState(GameState):
         #
         # camera
         self.camera = Camera(self.world, self.game.screen, self.tile_size)
+        #
+        # music
+        pygame.mixer.music.load("./sfx/piano-loop.wav")
+        pygame.mixer.music.play(-1)
 
     def events(self):
         for event in pygame.event.get():

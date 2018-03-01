@@ -1,6 +1,7 @@
 import pygame
 from os import path
 from world import *
+from sound_effects import *
 
 
 class Game:
