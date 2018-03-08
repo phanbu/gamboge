@@ -1,16 +1,16 @@
 # PockétMonsters: Gamboge
 
 ## At the beginning
-We wake aup to a bright shiny day.  Yawn.  We exit our little bush house.  We meet our friend, Sally.  
+We wake up to a bright shiny day.  Yawn.  We exit our little bush house.  We meet our friend, Sally.  
 
 ```
 Sally:  Hey, <PlayerName>, I heard that Simon said that you 
-        don't know anything about trining PocketMonsters.  
+        don't know anything about training PocketMonsters.  
         I think that you can beat him!  What happened to all
         of your PocketMonsters?
 ```
 
-If you try yo leave town, you run into Bob.
+If you try to leave town, you run into Bob.
 
 ```
 Bob:    Hey! You can't leave the village.  If you want to 
@@ -19,14 +19,14 @@ Bob:    Hey! You can't leave the village.  If you want to
 ```
 
 ## In the Village
-You go into the long grass.  Eventually, you hear a rustling.  You have to catch a PocketMonster.
+You go into the long grass. Eventually, you hear a rustling. You have to catch a PocketMonster.
 
 You need to have a PocketBall, so you need to go to the shop to buy one.
 To buy one, you need a coin.
 You can get a coin by talking to Bert in his tent.
 
 ```
-Bert:   You are going to challenge Simon?!?  Take this coin 
+Bert:   Are you going to challenge Simon?!?  Take this coin 
         so that you can start your adventure. 
 ```
 
