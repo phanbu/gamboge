@@ -31,11 +31,13 @@ class Character(pygame.sprite.Sprite):
         if not self.is_moving:
             self.started_moving = pygame.time.get_ticks()
             self.facing = direction
-            self.is_moving = True
             self.current_move = self.position + DIRECTIONS[self.facing]
             if pygame.sprite.spritecollide(self, self.game.obstacles, False, test_for_collision):
                 self.current_move = self.position
                 self.is_moving = False
+            else:
+                self.footstep.play()
+                self.is_moving = True
 
     def update(self):
         super().update()
@@ -47,7 +49,6 @@ class Character(pygame.sprite.Sprite):
             if diff == 1.0:
                 self.position = self.current_move
                 self.is_moving = False
-                self.footstep.play()
 
     def move_rect(self, position, distance=Vector(0, 0)):
         ts = self.game.tile_size
@@ -58,7 +59,7 @@ class Character(pygame.sprite.Sprite):
 class Player(Character):
     def __init__(self, game, x, y, *groups):
         super().__init__(game, x, y, groups)
-        self.player_img = path.join(self.game.img_folder, 'p017.png')
+        self.player_img = path.join(path.dirname(__file__), 'images', 'p017.png')
         self.sprite_sheet = SpriteSheetGrid(self.player_img, 3, 4, color_key=None, has_alpha=True)
         self.image = self.sprite_sheet.get_image(0)
         self.rect = self.image.get_rect()
@@ -131,9 +132,9 @@ class NPC(Character):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, *groups):
+    def __init__(self, map, x, y, *groups):
         super().__init__(groups)
-        ts = game.tile_size
+        ts = map.tile_size
         self.rect = pygame.Rect(x * ts, y * ts, ts, ts)
 
 
