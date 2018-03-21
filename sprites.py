@@ -108,7 +108,7 @@ class NPC(Character):
     def __init__(self, game, name, x, y, img, *groups):
         super().__init__(game, x, y, groups)
         self.name = name
-        self.img_file = path.join(self.game.img_folder, img + '.png')
+        self.img_file = path.join(path.dirname(__file__), 'images', img + '.png')
         self.sprite_sheet = SpriteSheetGrid(self.img_file, 3, 4, color_key=None, has_alpha=True)
         self.image = self.sprite_sheet.get_image(1)
         self.rect = self.image.get_rect()
@@ -118,10 +118,11 @@ class NPC(Character):
         self.talk_ticks = 2_000
 
     def interact(self):
-        self.started_talking = pygame.time.get_ticks()
-        if self.message is None:
-            self.message = MessageBox("Bob:  Hey! You can't leave town yet.", self.game.messages)
-            self.game.messages.add(self.message)
+        # self.started_talking = pygame.time.get_ticks()
+        # if self.message is None:
+        #     self.message = MessageBox("Bob:  Hey! You can't leave town yet.", self.game.messages)
+        #     self.game.messages.add(self.message)
+        pass
 
     def update(self):
         if self.started_talking is not None:
@@ -139,19 +140,24 @@ class Obstacle(pygame.sprite.Sprite):
 
 
 class MessageBox(pygame.sprite.Sprite):
-    def __init__(self, text, *groups):
+    def __init__(self, *groups):
         super().__init__(groups)
         s = pygame.display.get_surface()
         x = s.get_width() * 1/5
         y = s.get_height() * 4/5
         w = s.get_width() * 3/5
         h = s.get_height() * 1/5
+        self.surface = s
         self.rect = pygame.Rect(x, y, w, h)
         self.image = pygame.Surface((w, h))
         self.image.fill(0)
+
+    def set_message(self, msg):
         f = pygame.font.SysFont('Ariel', 20)
-        s = f.render(text, True, (255,255,255))
-        self.image.blit(s, (5,5))
+        self.surface.fill(0)
+        self.surface = f.render(msg, True, (255,255,255))
+        self.image.fill(0)
+        self.image.blit(self.surface, (5,5))
 
 
 def test_for_collision(one, two):
