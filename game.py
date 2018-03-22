@@ -1,7 +1,7 @@
 import pygame
 from os import path
-from world import *
 from state import *
+from world import Camera
 
 
 class Game:
@@ -21,12 +21,12 @@ class Game:
         #
         # camera and messages
         self.camera = Camera(self.screen)
-        # self.messages = MessageBox()
+        self.messages = MessageBox()
         #
         # game states
         self.states = {
             'SPLASH': SplashState(self),
-            'VILLAGE': AdventureState(self, TiledMap('village'), 'village', self.camera),
+            'VILLAGE': AdventureState(self, 'village', self.camera),
             'QUITTING': None,
         }
         self.state = self.states['SPLASH']

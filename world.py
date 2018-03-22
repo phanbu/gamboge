@@ -5,7 +5,7 @@ from sprites import *
 
 
 class TiledMap:
-    def __init__(self, name):
+    def __init__(self, name, messagebox):
         filename = path.join(path.dirname(__file__), 'maps', name + '.tmx')
         self.tilemap = pytmx.load_pygame(filename, pixelAlpa=True)
         self.width = self.tilemap.width  # in tiles
@@ -17,7 +17,9 @@ class TiledMap:
         self.obstacles = pygame.sprite.Group()
         self.interacts = pygame.sprite.Group()
         self.exits = pygame.sprite.Group()
-        # self.messages = pygame.sprite.Group()
+        #
+        # messages
+        self.messages = messagebox
         #
         # sprites
         self.player = Player(self, 20, 20, self.characters)
@@ -61,11 +63,9 @@ class TiledMap:
 
     def _load_exits(self):
         exits = self.tilemap.get_layer_by_name('exits')
-        print(type(exits))
         for x in exits:
-            print(type(x))
-            print(x.properties)
-            print(x.x, x.y, x.width, x.height)
+            print(x.x, x.y, x.width, x.height)  # these variables have the information needed to create the exit sprite's rect
+            print(x.properties)                 # these properties have the information needed to switch to the next map
 
 
 

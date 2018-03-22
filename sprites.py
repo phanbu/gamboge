@@ -26,7 +26,6 @@ class Character(pygame.sprite.Sprite):
         self.rect = None
         self.footstep = pygame.mixer.Sound("./sfx/footstep.wav")
 
-
     def start_moving(self, direction):
         if not self.is_moving:
             self.started_moving = pygame.time.get_ticks()
@@ -83,7 +82,6 @@ class Player(Character):
         elif self.facing == 'right':
             self.image = self.sprite_sheet.get_image((anim, 2))
 
-
     def read_controls(self):
         if not self.is_moving:
             keys = pygame.key.get_pressed()
@@ -113,23 +111,11 @@ class NPC(Character):
         self.image = self.sprite_sheet.get_image(1)
         self.rect = self.image.get_rect()
         self.move_rect(self.position)
-        self.message = None
-        self.started_talking = None
-        self.talk_ticks = 2_000
+        self.message = "Bob:  Hey! You can't leave town yet."
 
     def interact(self):
-        # self.started_talking = pygame.time.get_ticks()
-        # if self.message is None:
-        #     self.message = MessageBox("Bob:  Hey! You can't leave town yet.", self.game.messages)
-        #     self.game.messages.add(self.message)
-        pass
-
-    def update(self):
-        if self.started_talking is not None:
-            ticks = pygame.time.get_ticks() - self.started_talking
-            if ticks > self.talk_ticks and self.message is not None:
-                self.message.kill()
-                self.message = None
+        if self.message is not None:
+            self.game.messages.set_message(self.message)
 
 
 class Obstacle(pygame.sprite.Sprite):
@@ -143,21 +129,23 @@ class MessageBox(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(groups)
         s = pygame.display.get_surface()
-        x = s.get_width() * 1/5
-        y = s.get_height() * 4/5
-        w = s.get_width() * 3/5
-        h = s.get_height() * 1/5
-        self.surface = s
-        self.rect = pygame.Rect(x, y, w, h)
-        self.image = pygame.Surface((w, h))
-        self.image.fill(0)
+        self.image = pygame.Surface((s.get_width(), int(s.get_height() * 1/10))).convert()
+        self.rect = pygame.Rect((0, s.get_height() * 9/10), self.image.get_size())
+        self.text = None
+        self.ticks = None
+        self.set_message('Hello!')
 
     def set_message(self, msg):
-        f = pygame.font.SysFont('Ariel', 20)
-        self.surface.fill(0)
-        self.surface = f.render(msg, True, (255,255,255))
+        self.image.set_alpha(200)
         self.image.fill(0)
-        self.image.blit(self.surface, (5,5))
+        f = pygame.font.SysFont('Ariel', 20)
+        surface = f.render(msg, True, (255,255,255))
+        self.image.blit(surface, (5,5))
+        self.ticks = pygame.time.get_ticks()
+
+    def update(self):
+        if pygame.time.get_ticks() - self.ticks > 2_000:
+            self.image.set_alpha(0)
 
 
 def test_for_collision(one, two):
