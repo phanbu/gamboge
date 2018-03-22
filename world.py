@@ -25,15 +25,19 @@ class TiledMap:
         self._load_exits()
         #
         # images
-        self.top, self.bottom = self._make_map()
+        self.top, self.bottom = self._render()
 
-    def render(self, top, bottom):
-        surface = bottom
+    def _render(self):
+        w = self.width * self.tilemap.tilewidth
+        h = self.height * self.tilemap.tileheight
+        top = pygame.Surface((w, h), pygame.SRCALPHA, 32).convert_alpha()
+        bottom = surface = pygame.Surface((w, h)).convert()
         for layer in self.tilemap.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
                 self._draw_tile_layer(layer, surface)
             if layer.name == 'collision':
                 surface = top
+        return top, bottom
 
     def _draw_tile_layer(self, layer, surface):
         tw = self.tilemap.tilewidth
@@ -45,14 +49,6 @@ class TiledMap:
                 surface.blit(tile, (x * tw, y * th))
                 if layer.name == 'collision':
                     Obstacle(self, x, y, self.obstacles)
-
-    def _make_map(self):
-        w = self.width * self.tilemap.tilewidth
-        h = self.height * self.tilemap.tileheight
-        top = pygame.Surface((w, h), pygame.SRCALPHA, 32).convert_alpha()
-        bottom = pygame.Surface((w, h)).convert()
-        self.render(top, bottom)
-        return top, bottom
 
     def _load_npcs(self, map_name):
         with open('npcs.txt') as f:
@@ -81,22 +77,30 @@ class Camera:
         self.display_width, self.display_height = display.get_size()
 
     def set_map(self, map):
-        self.tile_size = map.tilemap.tilewidth
-        self.map_width, self.map_height = map.width * self.tile_size, map.height * self.tile_size
-        self.camera = pygame.Rect(0, 0, map.width, map.height)
+        if map is None:
+            self.tile_size = None
+            self.map_width = self.map_height = None
+            self.camera = None
+        else:
+            self.tile_size = map.tilemap.tilewidth
+            self.map_width, self.map_height = map.width * self.tile_size, map.height * self.tile_size
+            self.camera = pygame.Rect(0, 0, map.width, map.height)
 
     def update(self, target):
-        x = -target.rect.centerx + int(self.display_width / 2)
-        y = -target.rect.centery + int(self.display_height / 2)
-        #
-        # don't scroll past the edge of the world in any direction
-        x = min(0, x)  # left
-        y = min(0, y)  # top
-        x = max(-(self.map_width - self.display_width), x)  # right
-        y = max(-(self.map_height - self.display_height), y)  # bottom
-        self.camera = pygame.Rect(x, y, self.map_width, self.map_height)
+        if self.camera is not None:
+            x = -target.rect.centerx + int(self.display_width / 2)
+            y = -target.rect.centery + int(self.display_height / 2)
+            #
+            # don't scroll past the edge of the world in any direction
+            x = min(0, x)  # left
+            y = min(0, y)  # top
+            x = max(-(self.map_width - self.display_width), x)  # right
+            y = max(-(self.map_height - self.display_height), y)  # bottom
+            self.camera = pygame.Rect(x, y, self.map_width, self.map_height)
 
     def apply(self, entity):
+        if self.camera is None:
+            return None
         if isinstance(entity, pygame.sprite.Sprite):
             return entity.rect.move(self.camera.topleft)
         elif isinstance(entity, pygame.Rect):

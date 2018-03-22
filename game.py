@@ -34,11 +34,12 @@ class Game:
     def run(self):
         while self.state is not None:
             self.delta_t = self.clock.tick(self.fps) / 1000.0
-            self.state.events()
             self.state.update()
             self.state.draw()
             pygame.display.flip()
+            self.state.events()
 
     def change_state(self, state):
         self.state = state
-        self.camera.set_map(state.get_map())
+        if state is not None:
+            self.camera.set_map(state.get_map())
