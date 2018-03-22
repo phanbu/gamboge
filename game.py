@@ -27,7 +27,7 @@ class Game:
         self.states = {
             'SPLASH': SplashState(self),
             'VILLAGE': AdventureState(self, TiledMap('village'), 'village', self.camera),
-            'QUITTING' : None,
+            'QUITTING': None,
         }
         self.state = self.states['SPLASH']
 
@@ -38,7 +38,6 @@ class Game:
             self.state.update()
             self.state.draw()
             pygame.display.flip()
-
 
     def change_state(self, state):
         self.state = state

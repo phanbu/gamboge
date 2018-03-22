@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="2017.10.11" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextobjectid="63">
  <tileset firstgid="1" name="pokemon-legends-tileset" tilewidth="32" tileheight="32" tilecount="21000" columns="140">
   <image source="pokemon-legends-tileset.png" width="4480" height="4800"/>
  </tileset>
@@ -327,4 +327,13 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup name="exits">
+  <object id="5" x="750.667" y="0" width="161.333" height="17.3333">
+   <properties>
+    <property name="next_state" value="FOREST"/>
+    <property name="player_x" value="92"/>
+    <property name="player_y" value="24"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

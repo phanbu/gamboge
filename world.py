@@ -16,11 +16,13 @@ class TiledMap:
         self.characters = pygame.sprite.Group()
         self.obstacles = pygame.sprite.Group()
         self.interacts = pygame.sprite.Group()
+        self.exits = pygame.sprite.Group()
         # self.messages = pygame.sprite.Group()
         #
         # sprites
         self.player = Player(self, 20, 20, self.characters)
         self._load_npcs(name)
+        self._load_exits()
         #
         # images
         self.top, self.bottom = self._make_map()
@@ -60,6 +62,15 @@ class TiledMap:
                     (name, img, npc_map, x, y) = line.split(':')
                     if map_name == npc_map:
                         NPC(self, name, int(x), int(y), img, self.characters, self.obstacles, self.interacts)
+
+    def _load_exits(self):
+        exits = self.tilemap.get_layer_by_name('exits')
+        print(type(exits))
+        for x in exits:
+            print(type(x))
+            print(x.properties)
+            print(x.x, x.y, x.width, x.height)
+
 
 
 class Camera:
