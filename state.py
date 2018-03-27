@@ -2,6 +2,7 @@ import pygame
 import pytmx
 from os import path
 from sprites import *
+from world import TiledMap
 
 
 class State:
@@ -51,14 +52,14 @@ class SplashState(State):
 
 
 class AdventureState(State):
-    def __init__(self, game, map, name, camera):
+    def __init__(self, game, name, camera):
         super().__init__(game)
         #
         # game world
-        self.map = map
+        self.map = TiledMap('village', game.messages)
         self.tile_size = self.map.tilemap.tilewidth
         self.camera = camera
-        # self.messages = game.messages
+        self.messages = game.messages
         #
         # music
         pygame.mixer.music.load("./sfx/piano-loop.wav")
@@ -69,14 +70,13 @@ class AdventureState(State):
 
     def events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.game.quit()
-            if (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
-                self.game.quit()
+            if (event.type == pygame.QUIT) \
+            or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+               self.game.change_state(self.game.states['QUITTING'])
 
     def update(self):
         self.map.characters.update()
-        # self.messages.update()
+        self.messages.update()
         self.camera.update(self.map.player)
 
     def draw(self):
@@ -85,5 +85,4 @@ class AdventureState(State):
         for sprite in self.map.characters:
             self.game.screen.blit(sprite.image, self.camera.apply(sprite))
         self.game.screen.blit(self.map.top, self.camera.apply(self.map.top.get_rect()))
-        # for sprite in self.messages:
-        #     self.game.screen.blit(sprite.image, sprite)
+        self.game.screen.blit(self.messages.image, self.messages.rect)
