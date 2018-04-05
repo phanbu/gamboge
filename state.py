@@ -56,7 +56,7 @@ class AdventureState(State):
         super().__init__(game)
         #
         # game world
-        self.map = TiledMap('village', game.messages)
+        self.map = TiledMap('village', game)
         self.tile_size = self.map.tilemap.tilewidth
         self.camera = camera
         self.messages = game.messages

@@ -5,7 +5,7 @@ from sprites import *
 
 
 class TiledMap:
-    def __init__(self, name, messagebox):
+    def __init__(self, name, game):
         filename = path.join(path.dirname(__file__), 'maps', name + '.tmx')
         self.tilemap = pytmx.load_pygame(filename, pixelAlpa=True)
         self.width = self.tilemap.width  # in tiles
@@ -19,10 +19,10 @@ class TiledMap:
         self.exits = pygame.sprite.Group()
         #
         # messages
-        self.messages = messagebox
+        self.messages = game.messages
         #
         # sprites
-        self.player = Player(self, 20, 20, self.characters)
+        self.player = Player(game, 20, 20, self.characters)
         self._load_npcs(name)
         self._load_exits()
         #

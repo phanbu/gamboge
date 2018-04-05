@@ -14,7 +14,7 @@ DIRECTIONS = {
 
 
 class Character(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, *groups):
+    def __init__(self, game, map, x, y, *groups):
         super().__init__(groups)
         self.game = game
         self.current_move = self.position = Vector(x, y)
@@ -73,6 +73,13 @@ class Player(Character):
             anim = 0 if diff < 0.5 else 2
         else:
             anim = 1
+            # see if I ran into an exit
+            print(self.game.state)
+            # if pygame.sprite.spritecollide(Player, exits, False):
+            #     print('next_state')
+            # if I did, print the new coordinates
+
+            # then move the player and load the new map
         if self.facing == 'up':
             self.image = self.sprite_sheet.get_image((anim, 3))
         elif self.facing == 'down':
@@ -165,5 +172,3 @@ def nearby(one, two):
     )
     return r.colliderect(two.rect)
 
-
-class GrassyArea(pygame.sprite.Sprite):

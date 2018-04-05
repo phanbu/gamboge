@@ -22,11 +22,13 @@ class Game:
         # camera and messages
         self.camera = Camera(self.screen)
         self.messages = MessageBox()
+        self.player = Player(self, 20, 20)
         #
         # game states
         self.states = {
             'SPLASH': SplashState(self),
-            'VILLAGE': AdventureState(self, 'village', self.camera),
+            'VILLAGE': AdventureState(self, self.player, 'village', self.camera),
+            'FOREST': AdventureState(self, self.player, 'forest', self.camera),
             'QUITTING': None,
         }
         self.state = self.states['SPLASH']
