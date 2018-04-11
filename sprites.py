@@ -51,7 +51,7 @@ class Character(pygame.sprite.Sprite):
                 self.is_moving = False
 
     def move_rect(self, position, distance=Vector(0, 0)):
-        loc = Vector((position.x + distance.x) * self.tile_size.x , (position.y + distance.y) * (self.tile_size.y + 1))
+        loc = Vector((position.x + distance.x) * self.tile_size.x , (position.y + distance.y + 1) * (self.tile_size.y))
         self.rect.bottomleft = (loc.x, loc.y)
 
 
