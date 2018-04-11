@@ -14,15 +14,16 @@ DIRECTIONS = {
 
 
 class Character(pygame.sprite.Sprite):
-    def __init__(self, game, map, x, y, *groups):
+    def __init__(self, game, position, *groups):
         super().__init__(groups)
         self.game = game
-        self.current_move = self.position = Vector(x, y)
+        self.tile_size = game.tile_size
+        self.current_move = self.position = position
         self.facing = 'down'
         self.is_moving = False
         self.move_anim = 'stop'
         self.started_moving = None
-        self.millis_per_grid_sq = 100
+        self.millis_per_grid_sq = 200
         self.rect = None
         self.footstep = pygame.mixer.Sound("./sfx/footstep.wav")
 
@@ -31,7 +32,7 @@ class Character(pygame.sprite.Sprite):
             self.started_moving = pygame.time.get_ticks()
             self.facing = direction
             self.current_move = self.position + DIRECTIONS[self.facing]
-            if pygame.sprite.spritecollide(self, self.game.obstacles, False, test_for_collision):
+            if pygame.sprite.spritecollide(self, self.game.state.map.obstacles, False, test_for_collision):
                 self.current_move = self.position
                 self.is_moving = False
             else:
@@ -50,14 +51,13 @@ class Character(pygame.sprite.Sprite):
                 self.is_moving = False
 
     def move_rect(self, position, distance=Vector(0, 0)):
-        ts = self.game.tile_size
-        loc = (self.position * ts) + (distance * ts)
-        self.rect.bottomleft = (loc.x, loc.y + ts)
+        loc = Vector((position.x + distance.x) * self.tile_size.x , (position.y + distance.y) * (self.tile_size.y + 1))
+        self.rect.bottomleft = (loc.x, loc.y)
 
 
 class Player(Character):
-    def __init__(self, game, x, y, *groups):
-        super().__init__(game, x, y, groups)
+    def __init__(self, game, position, *groups):
+        super().__init__(game, position, groups)
         self.player_img = path.join(path.dirname(__file__), 'images', 'p017.png')
         self.sprite_sheet = SpriteSheetGrid(self.player_img, 3, 4, color_key=None, has_alpha=True)
         self.image = self.sprite_sheet.get_image(0)
@@ -74,12 +74,12 @@ class Player(Character):
         else:
             anim = 1
             # see if I ran into an exit
-            print(self.game.state)
+            # print(self.game.state)
             # if pygame.sprite.spritecollide(Player, exits, False):
             #     print('next_state')
             # if I did, print the new coordinates
 
-            # then move the player and load the new map
+        # then move the player and load the new map
         if self.facing == 'up':
             self.image = self.sprite_sheet.get_image((anim, 3))
         elif self.facing == 'down':
@@ -105,13 +105,13 @@ class Player(Character):
                 self.image = self.sprite_sheet.get_image(3)
                 self.start_moving('right')
             if keys[pygame.K_SPACE]:
-                s = pygame.sprite.spritecollideany(self, self.game.interacts, nearby)
+                s = pygame.sprite.spritecollideany(self, self.game.state.map.interacts, nearby)
                 if s: s.interact()
 
 
 class NPC(Character):
-    def __init__(self, game, name, x, y, img, *groups):
-        super().__init__(game, x, y, groups)
+    def __init__(self, game, name, position, img, *groups):
+        super().__init__(game, position, groups)
         self.name = name
         self.img_file = path.join(path.dirname(__file__), 'images', img + '.png')
         self.sprite_sheet = SpriteSheetGrid(self.img_file, 3, 4, color_key=None, has_alpha=True)
@@ -126,10 +126,10 @@ class NPC(Character):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, map, x, y, *groups):
+    def __init__(self, game, position, *groups):
         super().__init__(groups)
-        ts = map.tile_size
-        self.rect = pygame.Rect(x * ts, y * ts, ts, ts)
+        ts = game.tile_size
+        self.rect = pygame.Rect(position.x * ts.x, position.y * ts.y, ts.x, ts.y)
 
 
 class MessageBox(pygame.sprite.Sprite):
@@ -157,18 +157,19 @@ class MessageBox(pygame.sprite.Sprite):
 
 def test_for_collision(one, two):
     r = pygame.Rect(
-        one.current_move.x * one.game.tile_size,
-        one.current_move.y * one.game.tile_size,
-        one.game.tile_size, one.game.tile_size
+        one.current_move.x * one.game.tile_size.x,
+        one.current_move.y * one.game.tile_size.y,
+        one.game.tile_size.x, one.game.tile_size.y
     )
     return r.colliderect(two.rect)
+
 
 def nearby(one, two):
     ts = one.game.tile_size
     r = pygame.Rect(
-        one.position.x * ts - ts,
-        one.position.y * ts - ts,
-        3*ts, 3*ts
+        one.position.x * ts.x - ts.x,
+        one.position.y * ts.y - ts.y,
+        3*ts.x, 3*ts.y
     )
     return r.colliderect(two.rect)
 

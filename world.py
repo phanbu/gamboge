@@ -5,36 +5,38 @@ from sprites import *
 
 
 class TiledMap:
-    def __init__(self, name, game):
+    def __init__(self, name, game, player=None):
         filename = path.join(path.dirname(__file__), 'maps', name + '.tmx')
-        self.tilemap = pytmx.load_pygame(filename, pixelAlpa=True)
-        self.width = self.tilemap.width  # in tiles
-        self.height = self.tilemap.height  # in tiles
-        self.tile_size = self.tilemap.tilewidth
+        self.map = pytmx.load_pygame(filename, pixelAlpa=True)
+        self.width = self.map.width  # in tiles
+        self.height = self.map.height  # in tiles
+        self.game = game
+        self.tile_size = game.tile_size
         #
         # sprite groups
         self.characters = pygame.sprite.Group()
         self.obstacles = pygame.sprite.Group()
         self.interacts = pygame.sprite.Group()
         self.exits = pygame.sprite.Group()
+        if player is not None:
+            self.characters.add(player)
         #
         # messages
         self.messages = game.messages
         #
         # sprites
-        self.player = Player(game, 20, 20, self.characters)
         self._load_npcs(name)
         self._load_exits()
         #
         # images
-        self.top, self.bottom = self._render()
+        self.overhead, self.underfoot = self._render()
 
     def _render(self):
-        w = self.width * self.tilemap.tilewidth
-        h = self.height * self.tilemap.tileheight
+        w = self.width * self.tile_size.x
+        h = self.height * self.tile_size.y
         top = pygame.Surface((w, h), pygame.SRCALPHA, 32).convert_alpha()
         bottom = surface = pygame.Surface((w, h)).convert()
-        for layer in self.tilemap.visible_layers:
+        for layer in self.map.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
                 self._draw_tile_layer(layer, surface)
             if layer.name == 'collision':
@@ -42,15 +44,14 @@ class TiledMap:
         return top, bottom
 
     def _draw_tile_layer(self, layer, surface):
-        tw = self.tilemap.tilewidth
-        th = self.tilemap.tileheight
-        img = self.tilemap.get_tile_image_by_gid
+        img = self.map.get_tile_image_by_gid
         for x, y, gid in layer:
             tile = img(gid)
             if tile:
-                surface.blit(tile, (x * tw, y * th))
+                tile = pygame.transform.smoothscale(tile, (int(self.tile_size.x), int(self.tile_size.y)))
+                surface.blit(tile, (x * self.tile_size.x, y * self.tile_size.y))
                 if layer.name == 'collision':
-                    Obstacle(self, x, y, self.obstacles)
+                    Obstacle(self.game, Vector(x, y), self.obstacles)
 
     def _load_npcs(self, map_name):
         with open('npcs.txt') as f:
@@ -59,10 +60,10 @@ class TiledMap:
                 if line:
                     (name, img, npc_map, x, y) = line.split(':')
                     if map_name == npc_map:
-                        NPC(self, name, int(x), int(y), img, self.characters, self.obstacles, self.interacts)
+                        NPC(self, name, Vector(int(x), int(y)), img, self.characters, self.obstacles, self.interacts)
 
     def _load_exits(self):
-        exits = self.tilemap.get_layer_by_name('exits')
+        exits = self.map.get_layer_by_name('exits')
         for x in exits:
             print(x.x, x.y, x.width, x.height)  # these variables have the information needed to create the exit sprite's rect
             print(x.properties)                 # these properties have the information needed to switch to the next map
@@ -82,8 +83,8 @@ class Camera:
             self.map_width = self.map_height = None
             self.camera = None
         else:
-            self.tile_size = map.tilemap.tilewidth
-            self.map_width, self.map_height = map.width * self.tile_size, map.height * self.tile_size
+            self.tile_size = map.tile_size
+            self.map_width, self.map_height = map.width * self.tile_size.x, map.height * self.tile_size.y
             self.camera = pygame.Rect(0, 0, map.width, map.height)
 
     def update(self, target):

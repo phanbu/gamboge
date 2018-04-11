@@ -52,12 +52,13 @@ class SplashState(State):
 
 
 class AdventureState(State):
-    def __init__(self, game, name, camera):
+    def __init__(self, game, player, name, camera):
         super().__init__(game)
         #
         # game world
-        self.map = TiledMap('village', game)
-        self.tile_size = self.map.tilemap.tilewidth
+        self.player = player
+        self.map = TiledMap(name, game, player)
+        self.tile_size = self.map.map.tilewidth
         self.camera = camera
         self.messages = game.messages
         #
@@ -77,12 +78,12 @@ class AdventureState(State):
     def update(self):
         self.map.characters.update()
         self.messages.update()
-        self.camera.update(self.map.player)
+        self.camera.update(self.player)
 
     def draw(self):
         pygame.display.set_caption(self.game.title + " [{:.2f} FPS]".format(self.game.clock.get_fps()))
-        self.game.screen.blit(self.map.bottom, self.camera.apply(self.map.bottom.get_rect()))
+        self.game.screen.blit(self.map.underfoot, self.camera.apply(self.map.underfoot.get_rect()))
         for sprite in self.map.characters:
             self.game.screen.blit(sprite.image, self.camera.apply(sprite))
-        self.game.screen.blit(self.map.top, self.camera.apply(self.map.top.get_rect()))
+        self.game.screen.blit(self.map.overhead, self.camera.apply(self.map.overhead.get_rect()))
         self.game.screen.blit(self.messages.image, self.messages.rect)
