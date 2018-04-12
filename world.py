@@ -67,6 +67,11 @@ class TiledMap:
         for x in exits:
             print(x.x, x.y, x.width, x.height)  # these variables have the information needed to create the exit sprite's rect
             print(x.properties)                 # these properties have the information needed to switch to the next map
+            next_state = x.properties['next_state']
+            player_x = int(x.properties['player_x'])
+            player_y = int(x.properties['player_y'])
+            groups = self.exits
+            exit = Exit(pygame.Rect(x.x, x.y, x.width, x.height), next_state, Vector(player_x, player_y,), groups)
 
 
 

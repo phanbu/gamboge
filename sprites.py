@@ -47,11 +47,14 @@ class Character(pygame.sprite.Sprite):
             distance = diff * DIRECTIONS[self.facing]
             self.move_rect(self.position, distance)
             if diff == 1.0:
-                self.position = self.current_move
+                self.move_rect(self.current_move)
                 self.is_moving = False
 
+
     def move_rect(self, position, distance=Vector(0, 0)):
-        loc = Vector((position.x + distance.x) * self.tile_size.x , (position.y + distance.y) * (self.tile_size.y + 1))
+        if distance.x==0 and distance.y==0:
+            self.position = self.current_move = position
+        loc = Vector((position.x + distance.x) * self.tile_size.x , (position.y + distance.y + 1) * self.tile_size.y)
         self.rect.bottomleft = (loc.x, loc.y)
 
 
@@ -66,19 +69,24 @@ class Player(Character):
 
     def update(self):
         self.read_controls()
+        was_moving = self.is_moving
         super().update()
+
         if self.is_moving:
             ticks = pygame.time.get_ticks() - self.started_moving
             diff = min(ticks / self.millis_per_grid_sq, 1.0)
             anim = 0 if diff < 0.5 else 2
         else:
             anim = 1
-            # see if I ran into an exit
-            # print(self.game.state)
-            # if pygame.sprite.spritecollide(Player, exits, False):
-            #     print('next_state')
-            # if I did, print the new coordinates
 
+        if was_moving and not self.is_moving:
+            exit = pygame.sprite.spritecollideany(self, self.game.state.map.exits)
+            if exit:
+                print(exit.next_state, exit.player_position)
+                self.game.change_state(self.game.states[exit.next_state])
+                self.move_rect(exit.player_position)
+
+        # if I did, print the new coordinates
         # then move the player and load the new map
         if self.facing == 'up':
             self.image = self.sprite_sheet.get_image((anim, 3))
@@ -130,6 +138,14 @@ class Obstacle(pygame.sprite.Sprite):
         super().__init__(groups)
         ts = game.tile_size
         self.rect = pygame.Rect(position.x * ts.x, position.y * ts.y, ts.x, ts.y)
+
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self, rect, next_state, player_position, *groups):
+        super().__init__(groups)
+        self.rect = rect
+        self.next_state = next_state
+        self.player_position = player_position
 
 
 class MessageBox(pygame.sprite.Sprite):

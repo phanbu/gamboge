@@ -29,7 +29,7 @@ class Game:
         self.states = {
             'SPLASH': SplashState(self),
             'VILLAGE': AdventureState(self, self.player, 'village', self.camera),
-            # 'FOREST': AdventureState(self, self.player, 'forest', self.camera),
+            'FOREST': AdventureState(self, self.player, 'forest', self.camera),
             'QUITTING': None,
         }
         self.state = self.states['SPLASH']
